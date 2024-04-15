@@ -1,0 +1,71 @@
+[
+{
+	"uri": "//localhost:1313/1-prerequisites/",
+	"title": "1. Prerequisites",
+	"tags": [],
+	"description": "",
+	"content": "All you need to complete this workshop is:\n1. An AWS account and a basic understanding of AWS services\n2. Terraform is installed on your machine: This workshop is focused on setting up the IAM User, IAM Roles and IAM Policies using Terraform, so you must install Terraform CLI onto your working machine.\n3. Familiarity with Terraform syntax (HCL): This particular blog requires you to be familiar with Terraform\n"
+},
+{
+	"uri": "//localhost:1313/2-role-policies/",
+	"title": "2. Understanding IAM Roles and Policies",
+	"tags": [],
+	"description": "",
+	"content": "If you are interest, I have a lesson recap for IAM.\nIf you\u0026rsquo;re already familiar with IAM, here\u0026rsquo;s a quick recap for this workshop. Anyway, it\u0026rsquo;s important to understand the concept of IAM roles and IAM policies.\n1. IAM Roles: a set of permissions that can be performed on AWS resources such as EC2, S3 Bucket, etc. In summary, using IAM Roles, you can grant permission to\nUser AWS Services Here are some benefits that you get with the IAM roles -\nFlexibility - The IAM roles can be assigned to any IAM user or AWS resource, and you can customize the granularity of the IAM roles based on your needs. Security - IAM roles are very granular in nature, and hence, they always add an extra layer of security to your cloud infrastructure. Scalability - When you use Terraform to manage IAM roles, it becomes really scalable, and any developer can manage the roles from the code. 2. IAM Policies - It is a JSON formatted document that defines the permissions for IAM users as well as IAM roles. With the help of IAM policies, you can control what kinds of actions you can perform on specific A WS resources.\nHere are two types of policies that exist:\nManaged Policies - IAM policies are managed policies that are administered by the account administrator. Inline Policies - These policies are directly embedded in the IAM user, IAM group, and IAM roles. "
+},
+{
+	"uri": "//localhost:1313/3-create-iam-user/",
+	"title": "3. Create an IAM User with `aws_iam_user`",
+	"tags": [],
+	"description": "",
+	"content": "Let\u0026rsquo;s start by creating an User which we call an IAM user. To keep our Terraform project code clean, I am going to create a file called iam-user.tf and put the following code inside the file.\nresource \u0026#34;aws_iam_user\u0026#34; \u0026#34;kathy\u0026#34; { name = \u0026#34;Kathy\u0026#34; } Code explanation\nThe above code will create an IAM user named Kathy. To run the above code, simply run terraform plan and terraform apply commands. After running the terraform code, you can verify the user by going into the AWS console -\u0026gt; IAM -\u0026gt; Access Management -\u0026gt; User "
+},
+{
+	"uri": "//localhost:1313/4-create-iam-role/",
+	"title": "IAM Terraform",
+	"tags": [],
+	"description": "",
+	"content": "4. Create an IAM Role using aws_iam_role resource \u0026#34;aws_iam_role\u0026#34; \u0026#34;kathy_role\u0026#34; { name = \u0026#34;KathyRole\u0026#34; assume_role_policy = jsonencode({ Version = \u0026#34;2012-10-17\u0026#34; Statement = [ { Action = \u0026#34;sts:AssumeRole\u0026#34; Effect = \u0026#34;Allow\u0026#34; Principal = { Service = \u0026#34;ec2.amazonaws.com\u0026#34; } } ] }) } Code explanation\nThe above code will create an IAM role named KathyRole. To run the above code, simply run terraform plan and terraform apply commands. After running the Terraform code, you can verify the user by going into the AWS console -\u0026gt; IAM -\u0026gt; Access Management -\u0026gt; Roles Click on the KathyRole to view the details about the roles .e.g., Creation Date, ARN, Instance Profile ARN etc..\n"
+},
+{
+	"uri": "//localhost:1313/5-create-iam-policy/",
+	"title": "IAM Terraform",
+	"tags": [],
+	"description": "",
+	"content": "5. Create IAM Policy aws_iam_policy An AWS IAM policy is like a set of rules that decide who can do what in the digital world of AWS.\nThese rules help make sure that people or programs can only get to the things they need and can\u0026rsquo;t touch anything they shouldn\u0026rsquo;t.\nHere is the IAM Policy for AllowS3Access:\nresource \u0026#34;aws_iam_policy\u0026#34; \u0026#34;allow_s3_access\u0026#34; { name = \u0026#34;AllowS3Access\u0026#34; description = \u0026#34;Allow Kathy to access specific S3 resources\u0026#34; policy = jsonencode({ Version = \u0026#34;2012-10-17\u0026#34; Statement = [ { Action = [ \u0026#34;s3:ListBucket\u0026#34;, \u0026#34;s3:GetObject\u0026#34;, \u0026#34;s3:PutObject\u0026#34; ] Effect = \u0026#34;Allow\u0026#34; Resource = [ \u0026#34;arn:aws:s3:::test-bucket-for-kathy\u0026#34;, \u0026#34;arn:aws:s3:::test-bucket-for-kathy/*\u0026#34; ] } ] }) } AllowS3Access : It is the name of the policy. description : A meaningful description to tell more about the policy policy : A Json string containing all the Actions and Resources Version = \u0026quot;2012-10-17\u0026quot;: This line indicates the policy language version. In this case, it is the 2012-10-17 version. Statement = [...]: This is an array of policy statements. In this example, there\u0026rsquo;s only one statement that is defined as follows: Action = [...] : This lists the actions that are allowed by the policy. In this case, it includes: \u0026quot;s3:ListBucket\u0026quot;: Listing the contents of a bucket. \u0026quot;s3:GetObject\u0026quot;: Retrieving an object from the bucket. \u0026quot;s3:PutObject\u0026quot;: Uploading an object to the bucket. Effect = \u0026quot;Allow\u0026quot;: This indicates that the actions listed above are allowed by the policy. Resource = [...]: This specifies the resources the policy applies to. In this example, there are two resources: \u0026quot;arn:aws:s3:::test-bucket-for-kathy\u0026quot;: The Amazon Resource Name (ARN) of the S3 bucket is \u0026ldquo;test-bucket-for-kathy\u0026rdquo;. This allows the policy to apply to the bucket itself. \u0026quot;arn:aws:s3:::test-bucket-for-kathy/*\u0026quot;: This allows the policy to apply to all objects within the \u0026ldquo;test-bucket-for-kathy\u0026rdquo; bucket. Click on the AllowS3Access Policy and you will find all the details related to that policy. "
+},
+{
+	"uri": "//localhost:1313/6-role-policy-attachment/",
+	"title": "IAM Terraform",
+	"tags": [],
+	"description": "",
+	"content": "6. Create IAM Role and Policy attachment IAM roles and policy attachments are crucial in AWS for maintaining secure and organized access control. They offer several advantages:\nLimited access: IAM roles and policies ensure that only authorized individuals or programs have access to specific resources, enhancing security by preventing unauthorized actions. Centralized management: Instead of managing access rights across various platforms or using disparate methods, IAM roles and policies provide a centralized platform for easy management and tracking of permissions. Reusable rules: Similar to creating a universal rule for specific actions, IAM roles and policies enable the creation of reusable access rules, reducing redundancy and simplifying permission management. Flexible updates: When access requirements change, IAM roles and policies facilitate easy updates without the need for manual adjustments across multiple resources. Secure sharing: IAM roles and policies enable secure sharing of resources by granting controlled access to authorized individuals or entities, ensuring that shared access remains within predefined boundaries. Here is the IAM Role and Policy Attachment for the KathyRole and AllowS3Access policies:\n# IAM Role and IAM Policy Attachment resource \u0026#34;aws_iam_role_policy_attachment\u0026#34; \u0026#34;attach_s3_access\u0026#34; { policy_arn = aws_iam_policy.allow_s3_access.arn role = aws_iam_role.kathy_role.name } Here is a detailed explanation of each policy:\nTo view Permission Policy of the role click on the Permission and then click on the + icon to expand the policy permission.\nIAM role permission policy description for KathyRole\n"
+},
+{
+	"uri": "//localhost:1313/7-clean-up/",
+	"title": "IAM Terraform",
+	"tags": [],
+	"description": "",
+	"content": "Clean Up Resources 1. Delete IAM Policies Navigate to IAM, choose Policies (1) -\u0026gt; choose the policy you want to delete (2) -\u0026gt; Click Delete (3) 2. Delete IAM Roles Navigate to IAM, choose Roles (1) -\u0026gt; choose the role you want to delete (2) -\u0026gt; Click Delete (3) 3. Delete IAM Users Navigate to IAM, choose Users (1) -\u0026gt; choose the user you want to delete (2) -\u0026gt; Click Delete (3) "
+},
+{
+	"uri": "//localhost:1313/",
+	"title": "IAM Terraform",
+	"tags": [],
+	"description": "",
+	"content": "Working with AWS IAM service using Terraform Overview Managing IAM Users, Roles and Policies are always crucial from a security perspective. Proper management of the IAM User, IAM Roles and IAM Policies can really improve the operational burden as well as the security of the AWS environment.\nContent Setting up "
+},
+{
+	"uri": "//localhost:1313/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "//localhost:1313/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]
